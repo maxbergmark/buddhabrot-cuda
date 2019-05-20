@@ -21,13 +21,13 @@ This repo was created to host my optimized implemetation of a Buddhabrot generat
 ### 20 iteration count
 
 <p align="center">
-	<img src="/images/example_grainy_20.png" width="100" />
-	<img src="/images/example_fine_20.png" width="100" />
+	<img src="/images/example_grainy_20.png" width="30%" />
+	<img src="/images/example_fine_20.png" width="30%" />
 </p>
 
 ### 100 iteration count
 
 <p align="center">
-	<img src="/images/example_grainy_100.png" width="100" />
-	<img src="/images/example_fine_100.png" width="100" />
+	<img src="/images/example_grainy_100.png" width="200" />
+	<img src="/images/example_fine_100.png" width="200" />
 </p>
