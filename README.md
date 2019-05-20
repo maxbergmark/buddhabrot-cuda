@@ -38,7 +38,7 @@ The grainy image was generated in 10ms, the fine image was generated in 2490ms.
 
 ## Performance
 
-This is some example output from my laptop (GTX 1050) and my desktop (GTX 1080Ti)
+This is some example output from my laptop (GTX 1050) and my desktop (GTX 1080Ti). In both tests, settings are adjusted to make the execution time about 30 seconds for the actual buddha calculation. However, the important distinction between the two tests is the total number of iterations, or the number of iterations per second. For the GTX 1050, a speed of about 750 Msamples/second is achieved, but for the GTX 1080Ti, a speed of 10 Gsamples/second is achieved. 
 
 ### GeForce GTX 1050 
 
@@ -53,4 +53,11 @@ This is some example output from my laptop (GTX 1050) and my desktop (GTX 1080Ti
 
 ### GeForce GTX 1080Ti
 
-	Coming soon
+	Mask generated in 14.47 seconds
+	Formatting...
+	Total iterations: 3.49555e+11
+	Iterations per pixel: 94822.95
+	Maximum frequency: 1086572
+	Minimum frequency: 0
+	Total time: 32.98s
+	Iterations per second: 1.06e+10

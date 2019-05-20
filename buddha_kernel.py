@@ -6,6 +6,7 @@ from pycuda import gpuarray
 import time
 import scipy.misc
 from matplotlib import pyplot as plt
+import os
 
 code = open("buddha_kernel.cu", "r").read()
 
@@ -49,9 +50,9 @@ def transform_image(canvas, x_dim, y_dim, dim):
 def generate_image(x_dim, y_dim, iters):
 
 	threads = 2**7
-	b_s = 2**8
+	b_s = 2**10
 	dim = 16
-	disc = np.int32(512)
+	disc = np.int32(1024)
 	grid_size = np.float32(1 / disc)
 	repeat = 1
 
@@ -70,8 +71,8 @@ def generate_image(x_dim, y_dim, iters):
 	# generate kernel and setup random number generation
 	module = SourceModule(
 		formatted_code,
-		no_extern_c=True,
-		options=['--use_fast_math', '-O3', '--ptxas-options=-O3']
+		no_extern_c = True,
+		options = ['--use_fast_math', '-O3', '--ptxas-options=-O3', '-I%s/include' % os.getcwd()]
 	)
 	mask_func = module.get_function("mask_kernel")
 	fill_func = module.get_function("buddha_kernel")
@@ -130,7 +131,7 @@ def run_benchmark(x_dim, y_dim, iters, dim, threads, b_s, disc, repeat):
 	module = SourceModule(
 		formatted_code,
 		no_extern_c=True,
-		options=['--use_fast_math', '-O3', '--ptxas-options=-O3']
+		options=['--use_fast_math', '-O3', '--ptxas-options=-O3', '-I./']
 	)
 	mask_func = module.get_function("mask_kernel")
 	fill_func = module.get_function("buddha_kernel")

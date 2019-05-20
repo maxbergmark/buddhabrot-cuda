@@ -1,6 +1,6 @@
 #include <curand_kernel.h>
 #include <stdio.h>
-#include "/usr/local/cuda/samples/common/inc/helper_math.h"
+#include "helper_math.h"
 
 #define X_MIN (-1.5f)
 #define X_MAX 1.5f
@@ -18,11 +18,18 @@
 
 __constant__ float X_SCALE = 1/(X_MAX - X_MIN) * X_DIM;
 __constant__ float Y_SCALE = 1/(Y_MAX - Y_MIN) * Y_DIM;
-__constant__ static float2 xy_min = (float2){X_MIN, Y_MIN};
-__constant__ static float2 xy_scale = (float2){
-	1/(X_MAX - X_MIN) * X_DIM,
-	1/(Y_MAX - Y_MIN) * Y_DIM
-};
+//const float2 xy_min = (float2){X_MIN, Y_MIN};
+//__constant__ static float2 xy_scale = (float2){
+//	1/(X_MAX - X_MIN) * X_DIM,
+//	1/(Y_MAX - Y_MIN) * Y_DIM
+//};
+
+__device__ void to_pixel(float2 &temp, int2 &ixy,
+	float2 xy_min, float2 xy_scale) {
+	temp -= xy_min;
+	temp *= xy_scale;
+	ixy = make_int2(temp);
+}
 
 __device__
 int xy2d (int2 ixy) {
@@ -33,26 +40,17 @@ int xy2d (int2 ixy) {
 //	return block;
 }
 
-
-__device__
-void to_pixel(float2 &temp, int2 &ixy) {
-	temp -= xy_min;
-	temp *= xy_scale;
-	ixy = make_int2(temp);
-}
-
 __device__
 void write_pixel(float2 temp, int2 ixy,
-	float4 z, unsigned int *canvas) {
+	float4 z, float2 xy_min, float2 xy_scale, unsigned int *canvas) {
 	temp.x = z.y;
 	temp.y = z.x;
-	to_pixel(temp, ixy);
+	to_pixel(temp, ixy, xy_min, xy_scale);
 	if (0 <= ixy.x & ixy.x < X_DIM & 0 <= ixy.y & ixy.y < Y_DIM) {
-	// if (0 <= idx & idx < X_DIM*Y_DIM) {
-		// atomicAdd(&(canvas[ixy.y*X_DIM + ixy.x]), 1);
 		int idx = xy2d(ixy);
+//		atomicAdd(&(canvas[ixy.y*X_DIM + ixy.x]), 1);
 		atomicAdd(&(canvas[idx]), 1);
-		// canvas[ixy.y*X_DIM + ixy.x] = idx;
+//		canvas[ixy.y * X_DIM + ixy.x] = idx;
 		// atomicAdd(&(canvas[(ixy.y+1)*X_DIM - ixy.x-1]), 1);
 	}
 }
@@ -91,7 +89,7 @@ bool check_bulbs(float4 z) {
 __device__
 __forceinline__
 void write_to_image(float4 z, float2 temp, int2 ixy, 
-	int count, unsigned int *canvas) {
+	int count, float2 xy_min, float2 xy_scale, unsigned int *canvas) {
 	z.x = z.z;
 	z.y = z.w;
 	for (int j = 0; j < count; j++) {
@@ -99,9 +97,10 @@ void write_to_image(float4 z, float2 temp, int2 ixy,
 		temp.y = 2*z.x*z.y + z.w;
 		z.x = temp.x;
 		z.y = temp.y;
-		write_pixel(temp, ixy, z, canvas);
+		write_pixel(temp, ixy, z, xy_min, xy_scale, canvas);
 	}
 }
+
 
 __device__
 __forceinline__
@@ -147,7 +146,7 @@ __device__
 __forceinline__
 void iterate(float4 z, unsigned int count, float dist, int2 ixy, 
 	float2 temp, float2 coord, float gridSize, 
-	curandState_t s, unsigned int *canvas, unsigned int *min_mask, int mask_index, unsigned int use_mask) {
+	curandState_t s, unsigned int *canvas, unsigned int *min_mask, int mask_index, unsigned int use_mask, float2 xy_min, float2 xy_scale) {
 
 	for(int i = 0; i < %(REPEAT)s; i++) {
 
@@ -162,9 +161,9 @@ void iterate(float4 z, unsigned int count, float dist, int2 ixy,
 			check_if_in_buddha_fast(z, temp, count, dist, min_mask, mask_index, use_mask);
 
 			if (dist > 4) {
-				write_to_image(z, temp, ixy, count, canvas);
+				write_to_image(z, temp, ixy, count, xy_min, xy_scale, canvas);
 				z.w *= -1;
-				write_to_image(z, temp, ixy, count, canvas);						 
+				write_to_image(z, temp, ixy, count, xy_min, xy_scale, canvas);						 
 			}
 		}
 	}
@@ -206,6 +205,9 @@ void buddha_kernel(unsigned int *canvas, int seed, float gridSize,
 
 	int2 ixy, gridCoord;
 	float2 temp, coord;
+	float2 xy_min, xy_scale;
+	xy_min = make_float2(X_MIN, Y_MIN);
+	xy_scale = make_float2(1/(X_MAX - X_MIN) * X_DIM, 1/(Y_MAX - Y_MIN) * Y_DIM);
 	unsigned int count;
 	float4 z;
 	float dist;
@@ -220,7 +222,7 @@ void buddha_kernel(unsigned int *canvas, int seed, float gridSize,
 			mask_index = gridCoord.y * gridDisc + gridCoord.x;
 			if (!use_mask | max_mask[mask_index] > 0) {
 				iterate(z, count, dist, ixy, temp, coord, 
-					gridSize, s, canvas, min_mask, mask_index, use_mask);
+					gridSize, s, canvas, min_mask, mask_index, use_mask, xy_min, xy_scale);
 				__syncthreads();
 			}
 			gridCoord.y++;
