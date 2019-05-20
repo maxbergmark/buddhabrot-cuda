@@ -24,7 +24,7 @@ def format_and_save(cpu_canvas, x_dim, y_dim, threads, iters):
 	cpu_canvas /= max(1, np.max(cpu_canvas))
 	cpu_canvas.shape = (y_dim, x_dim)
 	# this just makes the color gradient more visually pleasing
-	cpu_canvas = np.minimum(1.5*cpu_canvas, cpu_canvas*.2+.8)
+	cpu_canvas = np.minimum(2.5*cpu_canvas, cpu_canvas*.2+.8)
 
 	file_name = "images/pycuda_%dx%d_%d_%d.png" % (x_dim, y_dim, iters, threads)
 	print("\n\tSaving %s..." % file_name)
@@ -51,7 +51,7 @@ def generate_image(x_dim, y_dim, iters):
 	threads = 2**7
 	b_s = 2**8
 	dim = 16
-	disc = np.int32(128)
+	disc = np.int32(512)
 	grid_size = np.float32(1 / disc)
 	repeat = 1
 
@@ -203,8 +203,8 @@ def run_test_suite(x_dim, y_dim, iters):
 
 if __name__ == "__main__":
 
-	x_dim = 144*2
-	y_dim = 256*2
-	iters = 100
+	x_dim = 1440
+	y_dim = 2560
+	iters = 20
 	generate_image(x_dim, y_dim, iters)
 	# run_test_suite(x_dim, y_dim, iters)
