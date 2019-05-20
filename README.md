@@ -20,8 +20,14 @@ This repo was created to host my optimized implemetation of a Buddhabrot generat
 
 ### 20 iteration count
 
-![Grainy image 20](https://raw.githubusercontent.com/maxbergmark/buddhabrot-cuda/master/images/example_grainy_20.png) ![Fine image 20](https://raw.githubusercontent.com/maxbergmark/buddhabrot-cuda/master/images/example_fine_20.png)
+<p align="center">
+	<img src="/images/example_grainy_20.png" width="100" />
+	<img src="/images/example_fine_20.png" width="100" />
+</p>
 
 ### 100 iteration count
 
-![Grainy image 100](https://raw.githubusercontent.com/maxbergmark/buddhabrot-cuda/master/images/example_grainy_100.png) ![Fine image 100](https://raw.githubusercontent.com/maxbergmark/buddhabrot-cuda/master/images/example_fine_100.png)
+<p align="center">
+	<img src="/images/example_grainy_100.png" width="100" />
+	<img src="/images/example_fine_100.png" width="100" />
+</p>
