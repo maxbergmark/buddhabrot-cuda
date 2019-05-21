@@ -5,7 +5,6 @@ This repo was created to host my optimized implemetation of a Buddhabrot generat
 ## Requirements
 
 * CUDA 9.0
-* CUDA 9.0 Samples (used for `helper_math.h`)
 * PyCuda built for CUDA 9.0
 * `numpy`
 * `scipy`
@@ -61,3 +60,16 @@ This is some example output from my laptop (GTX 1050) and my desktop (GTX 1080Ti
 	Minimum frequency: 0
 	Total time: 32.98s
 	Iterations per second: 1.06e+10
+	
+### Maximum performance
+
+There are multiple ways of increasing performance, but a lot of them come with a tradeoff that execution time will be longer. In order to maximize the number of samples per second, the discretization constant should be at least 8192. The thread size should be 128 or 256 (can also depend on your GPU), and the block size should be as large as possible. After this, the `repeat` variable can be set to linearly scale the execution time while slightly improving performance. With all of this configured, it is possible to squeeze around 40% more performance out of the script. For the benchmark below, the `repeat` variable was set to `4`.
+
+	Total iterations: 1.78973e+14
+	Iterations per pixel: 48549443.94
+	Maximum frequency: 556520308
+	Minimum frequency: 0
+	Total time: 12279.47s
+	Iterations per second: 1.46e+10
+	
+Another factor which impacts performance is the size of the output image. The number of iterations per second drops as the image size increases. For all of these benchmarks, the image size has been fixed at 1440x2560 pixels in order to ensure measurability of performance. The sampling area is also adjusted for this aspect ratio, but could be automatically calculated in a future version. 
